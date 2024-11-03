@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import { useStore } from 'vuex';
 
+const EmptyComponent = { template: '<div></div>' }
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -17,7 +19,7 @@ const router = createRouter({
           next('/login')
         }
         else {
-          next()
+          next('/shell')
         }
       }
     },
@@ -27,7 +29,7 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/SettingView.vue')
+      component: () => import('../views/SettingView.vue'),
     },
     {
       path: '/shell',
@@ -35,7 +37,8 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/ShellView.vue')
+      // component: () => import('../views/ShellView.vue')
+      component: EmptyComponent
     },
     {
       path: '/navview',
@@ -52,7 +55,16 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/LoginView.vue')
-    },   
+    }, 
+    {
+      path: '/document',
+      name: 'document',
+      component: EmptyComponent,
+      beforeEnter(to, from, next) {
+        window.open('https://emnavi.tech', '_blank'); // 在新窗口打开
+        next(false); // 阻止原本的导航
+      }
+    }  
   ]
 })
 

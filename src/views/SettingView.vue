@@ -42,7 +42,7 @@
   </el-row>
 
   <el-dialog v-model="dialogTableVisible" title="WIFI列表" width="600">
-    <WifiList @sta_connect="getCurrentSetting"/>
+    <WifiList @sta_connect="getCurrentSetting" />
   </el-dialog>
   <!-- 设置服务器转发 -->
   <el-row :gutter="20">
@@ -50,7 +50,7 @@
       <div class="setting-content">转发服务器地址</div>
     </el-col>
     <el-col :span="2">
-      <el-input style="width: 240px;" placeholder="127.0.0.1:7890">
+      <el-input v-model="foward_server" style="width: 240px;" placeholder="127.0.0.1:7890">
         <template #prepend>http://</template>
       </el-input>
     </el-col>
@@ -60,22 +60,25 @@
       <div class="setting-content">使用服务器转发</div>
     </el-col>
     <el-col :span="2">
-      <el-switch v-model="is_forward" />
+      <el-switch v-model="is_forward" :before-change="beforeProxyChange" @change="changeProxyMode" />
     </el-col>
   </el-row>
   <!-- 其他 -->
-  <div class="setting-divider">User</div>
+  <!-- <div class="setting-divider">User</div> -->
 
 </template>
 <script setup>
 import { ref, reactive, toRefs, onMounted } from 'vue'
 import { ElNotification } from 'element-plus'
 import axios from 'axios';
+import { useStore } from 'vuex';
 import WifiList from "../components/WifiList.vue";
 
+const store = useStore(); // 获取 store
 const collapseNewwork = ref(false);
 
 const ap_wifi_name = ref('');
+const foward_server = ref('');
 const next_wifi_type = ref('');
 const current_wifi_type = ref('');
 const is_forward = ref(false);
@@ -100,40 +103,104 @@ const WifiType = [
   }
 ]
 
+function isValidIpPort(str) {
+  const regex = /^(\d{1,3}\.){3}\d{1,3}:\d{1,5}$/;
+  return regex.test(str);
+}
+
+const beforeProxyChange = async (value) => {
+  if (!isValidIpPort(foward_server.value)) {
+    ElNotification({
+      title: '设置代理',
+      message: '转发服务器地址错误1',
+      type: 'error',
+    })
+    return false;
+  }
+  return true;
+}
+const changeProxyMode = async () => {
+  if (!isValidIpPort(foward_server.value)) {
+    ElNotification({
+      title: '设置代理',
+      message: '转发服务器地址错误',
+      type: 'error',
+    })
+    return;
+  }
+  try {
+    let addr = foward_server.value.split(':');
+    const postData = {
+      device_id: store.state.device_id,
+      host: addr[0],
+      port: Number(addr[1]),
+      enable_proxy:is_forward.value
+    };
+    console.log(postData);
+    const response = await axios.post('/api/set-proxy', postData);
+    if (response.data.status === 'success') {
+      ElNotification({
+        title: '设置代理',
+        message: '成功设置代理',
+        type: 'success',
+      })
+    }
+    else {
+      ElNotification({
+        title: '设置代理',
+        message: '设置代理失败',
+        type: 'error',
+      })
+    }
+  } catch (err) {
+    ElNotification({
+      title: '设置代理',
+      message: '设置代理时发生错误：' + err.message,
+      type: 'error',
+    })
+  }
+};
+
+
 
 const changetoApMode = async () => {
   ElNotification({
     title: '切换至AP模式',
-    message: '稍后请重新连接至设备wifi:'+ap_wifi_name.value,
+    message: '稍后请重新连接至设备wifi:' + ap_wifi_name.value,
     type: 'info',
     duration: 10000
   })
   try {
-        const response = await axios.get('/api/set-ap-mode'); // 替换为你的 API 地址
-        console.log(response.data);
-        if(response.data.status === 'success'){
-          ap_wifi_name.value = response.data.ap_wifi_name; 
-          current_wifi_type.value = 'ap';
-          next_wifi_type.value = 'ap';
-          ElNotification({
-            title: '切换至AP模式',
-            message: '成功切换至AP模式',
-            type: 'success',
-          })
-        }
-        else{
-          ElNotification({
-            title: '切换至AP模式',
-            message: '切换至AP模式失败',
-            type: 'error',
-          })
-        }
-    } catch (err) {
-        // error.value = '无法获取 WiFi 列表';
-        // console.error(err);
-    } finally {
-        // loading.value = false;
+
+    const response = await axios.get('/api/set-ap-mode', {
+      params: {
+        device_id: store.state.device_id,
+      }
+    }); // 替换为你的 API 地址
+    console.log(response.data);
+    if (response.data.status === 'success') {
+      ap_wifi_name.value = response.data.ap_wifi_name;
+      current_wifi_type.value = 'ap';
+      next_wifi_type.value = 'ap';
+      ElNotification({
+        title: '切换至AP模式',
+        message: '成功切换至AP模式',
+        type: 'success',
+      })
     }
+    else {
+      ElNotification({
+        title: '切换至AP模式',
+        message: '切换至AP模式失败',
+        type: 'error',
+      })
+    }
+  } catch (err) {
+    // error.value = '无法获取 WiFi 列表';
+    // console.error(err);
+  } finally {
+    // loading.value = false;
+  }
 
 }
 
@@ -143,27 +210,51 @@ const changetoApMode = async () => {
 
 const getCurrentSetting = async () => {
 
-    try {
-        // 并行请求
-        const [wifiModeResponse, apWifiNameResponse] = await Promise.all([
-            axios.get('/api/get-wifi-mode'),
-            axios.get('/api/get-ap-wifi-name'),
-        ]);
+  try {
+    // 并行请求
+    const [wifiModeResponse, apWifiNameResponse, getProxyResponse] = await Promise.all([
+      axios.get('/api/get-wifi-mode', {
+        params: {
+          device_id: store.state.device_id,
+        }
+      }),
+      axios.get('/api/get-ap-wifi-name', {
+        params: {
+          device_id: store.state.device_id,
+        }
+      }),
+      axios.get('/api/get-proxy', {
+        params: {
+          device_id: store.state.device_id,
+        }
+      }),
+    ]);
 
-        // 处理 WiFi 模式
-        console.log(wifiModeResponse.data);
-        current_wifi_type.value = wifiModeResponse.data.mode;
-        next_wifi_type.value = wifiModeResponse.data.mode;
+    // 处理 WiFi 模式
+    console.log(wifiModeResponse.data);
+    current_wifi_type.value = wifiModeResponse.data.mode;
+    next_wifi_type.value = wifiModeResponse.data.mode;
 
-        // 处理 AP 模式下的 WiFi 名称
-        console.log(apWifiNameResponse.data);
-        ap_wifi_name.value = apWifiNameResponse.data.ap_wifi_name;
+    // 处理 AP 模式下的 WiFi 名称
+    console.log(apWifiNameResponse.data);
+    ap_wifi_name.value = apWifiNameResponse.data.ap_wifi_name;
 
-    } catch (err) {
-        console.error(err);
-    } finally {
-        // loading.value = false; // 无论成功与否，结束加载状态
+    // 处理代理设置
+    console.log(getProxyResponse.data);
+    if (getProxyResponse.data.proxy_status == 'on') {
+      is_forward.value = true;
+      let cleanUrl = getProxyResponse.data.proxy_addr.replace(/https?:\/\//, ''); // 删除 http:// 或 https://
+      foward_server.value = cleanUrl;
     }
+    else {
+      is_forward.value = false;
+    }
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    // loading.value = false; // 无论成功与否，结束加载状态
+  }
 };
 
 onMounted(getCurrentSetting);
@@ -172,7 +263,7 @@ onMounted(getCurrentSetting);
 <style scoped>
 .setting-param {
   margin-right: 50px;
-  
+
 }
 
 .header-content {
@@ -181,12 +272,14 @@ onMounted(getCurrentSetting);
   font-size: 28px;
   color: #faf8f8;
 }
+
 .setting-content {
   border-radius: 4px;
   min-height: 36px;
   font-size: 14px;
   color: #faf8f8;
 }
+
 .setting-2nd-content {
   border-radius: 4px;
   min-height: 36px;

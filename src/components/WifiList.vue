@@ -19,28 +19,32 @@
 
             <el-table-column label="操作" width="180">
                 <template #default="scope">
-                    <el-button v-if="scope.row.active=='no'" @click="selectWifi(scope.row)" type="primary">连接</el-button>
+                    <el-button v-if="scope.row.active == 'no'" @click="selectWifi(scope.row)"
+                        type="primary">连接</el-button>
                     <div v-else>已连接</div>
                 </template>
             </el-table-column>
         </el-table>
         <el-dialog v-model="ready_to_connect" title="WIFI连接" :align-center="true" width="400">
-            <WifiConnect :wifi="selectedWifi" @submit="handleSubmit" @connect_success="fetchWifiList"/>
+            <WifiConnect :wifi="selectedWifi" @submit="handleSubmit" @connect_success="fetchWifiList" />
         </el-dialog>
     </div>
 </template>
 <script setup>
-import { ref, onMounted,defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import WifiConnect from "../components/WifiConnect.vue";
+import { useStore } from 'vuex';
+
+const store = useStore(); // 获取 store
 const emit = defineEmits(['sta_connect']);
 
 const wifiList = ref([]);
 const loading = ref(false);
 const error = ref(null);
 function handleSubmit() {
-  // 执行提交操作（可选）
-  ready_to_connect.value = false; // 关闭对话框
+    // 执行提交操作（可选）
+    ready_to_connect.value = false; // 关闭对话框
 }
 
 
@@ -63,7 +67,12 @@ const fetchWifiList = async () => {
     error.value = null;
 
     try {
-        const response = await axios.get('/api/wifi'); // 替换为你的 API 地址
+        const response = await axios.get('/api/wifi', {
+            params: {
+                device_id: store.state.device_id,
+            }
+        }
+        ); // 替换为你的 API 地址
         wifiList.value = response.data; // 假设返回的数据是一个 WiFi 对象数组
     } catch (err) {
         error.value = '无法获取 WiFi 列表';

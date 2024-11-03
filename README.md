@@ -1,33 +1,16 @@
-# emDashboard
+# emNaviBoard
 
-This template should help get you started developing with Vue 3 in Vite.
+emNaviBoard 是 emNaviDevSuite 的一部分，是基于vue.js构建的前端管理面板。
 
-## Recommended IDE Setup
+## 快速构建
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
+首先安装 pnpm 和 node.js
+```bash
+git clone https://github.com/hyaline-wang/emNaviboard.git
+cd emNaviboard
+pnpm install 
+# Compile and Hot-Reload for Development
 pnpm dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
+# Type-Check, Compile and Minify for Production
 pnpm build
 ```

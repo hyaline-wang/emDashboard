@@ -58,13 +58,12 @@ const handleLogin = async () => {
       console.log('Logging in with', loginData);
 
       // 发送登录请求
-      const response = await axios.post('/api/verify-password', loginData);
+      const response = await axios.post('/api/login', loginData);
 
       if (response.data.status === 'success') {
         // 在这里处理成功的登录逻辑
-        store.commit('increment'); // 调用 store 的 increment 方法
-        router.push('/'); // 跳转到首页或其他页面
-
+        store.commit('login_in', response.data.device_id); // 调用 store 的 login_in 方法
+        router.push('/shell'); // 跳转到首页或其他页面
         ElMessage.success('登录成功！');
       } else {
         ElMessage.error('登录失败：' + response.data.message);

@@ -7,16 +7,39 @@
             @error="handleError">
         </iframe>
 
+    <el-button plain @click="dialogVisible = true">
+        Click to open the Dialog
+    </el-button>
+    <el-dialog v-model="dialogVisible" title="CodeEidtor" width="90%" top="3vh">
+        <CodeEidtor />
+    </el-dialog>
     </div>
 
 </template>
 
 <script setup>
-import { fa } from 'element-plus/es/locales.mjs';
+import CodeEidtor from '@/components/CodeEidtor.vue';
 import { ref, onMounted } from 'vue';
 const iframeSrc = ref(""); // 替换为你想要加载的URL
 const loadSuccess = ref(false);
 // const iframe = ref(null);
+const dialogVisible = ref(false)
+
+// 定义调用 API 的函数
+// const startTtyd = async () => {
+//   try {
+//     const response = await axios.get('/api/start-ttyd',{
+//         params: {
+//           device_id: store.state.device_id,
+//         }
+//       });
+//     console.info( response.data.message);
+
+//   } catch (error) {
+//     console.error('Error starting ttyd:', error);
+//   }
+// };
+
 
 // 在组件挂载时设置默认的 iframe URL
 onMounted(() => {

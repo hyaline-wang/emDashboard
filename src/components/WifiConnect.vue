@@ -23,6 +23,9 @@
 import { ref, onMounted, defineProps,defineEmits  } from 'vue';
 import axios from 'axios';
 import { ElNotification } from 'element-plus'
+import { useStore } from 'vuex';
+
+const store = useStore(); // 获取 store
 const emit = defineEmits(['submit','connect_success']);
 const props = defineProps({
   wifi: {
@@ -50,6 +53,7 @@ const connectToWifi = async () => {
     const postData = {
       ssid: props.wifi.ssid,
       password: wifipasswd.value,
+      device_id: store.state.device_id,
     };
     console.log(postData);
     const response = await axios.post('/api/connect', postData);

@@ -16,24 +16,26 @@ const store = createStore({
     state () {
       return {
         count: 0,
-        // isLoggedIn: false,
-        isLoggedIn: localStorage.getItem('isLoggedIn') === 'true', // 从 localStorage 读取状态
-
+        isLoggedIn: false,
+        // isLoggedIn: localStorage.getItem('isLoggedIn') === 'true', // 从 localStorage 读取状态
+        device_id: "",
 
       }
     },
     mutations: {
+      login_in (state, device_id) {
+        state.device_id = device_id;
+        console.log('state.device_id', state.device_id)
+        state.isLoggedIn = true;
+        localStorage.setItem('device_id', device_id); // 设置 localStorage
+        console.log('state.isLoggedIn', state.isLoggedIn)
+      },
       increment (state) {
         state.count++;
-        state.isLoggedIn = true;
-        localStorage.setItem('isLoggedIn', 'true'); // 设置 localStorage
-        console.log('state.count', state.count)
-        console.log('state.isLoggedIn', state.isLoggedIn)
       },
       logout (state) {
         localStorage.removeItem('isLoggedIn'); // 示例：清除 localStorage 中的登录状态
         state.isLoggedIn = false;
-
       }
     }
   })
