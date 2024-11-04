@@ -1,27 +1,25 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '../views/DashboardView.vue'
+import { createRouter, createWebHistory,createMemoryHistory  } from 'vue-router'
 import { useStore } from 'vuex';
 
 const EmptyComponent = { template: '<div></div>' }
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createMemoryHistory(),
+  // history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       name: 'home',
-      component: DashboardView,
-      beforeEnter: (to, from, next) => {
-        const store = useStore()
-        console.log('Before entering DashboardView')
-        console.log('store.state.isLoggedIn', store.state.isLoggedIn)
-        if (!store.state.isLoggedIn) {
-          next('/login')
-        }
-        else {
-          next('/shell')
-        }
-      }
+      component: EmptyComponent,
+      // component: () => import('../views/DashboardView.vue')
+      // beforeEnter: (to, from, next) => {
+      //   const store = useStore()
+      //   console.log('Before entering DashboardView')
+      //   console.log('store.state.isLoggedIn', store.state.isLoggedIn)
+      //   if (store.state.isLoggedIn) {
+      //      next('/shell')
+      //   }
+      // }
     },
     {
       path: '/setting',
@@ -48,14 +46,14 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/NavView.vue')
     },
-    {
-      path: '/login',
-      name: 'login',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/LoginView.vue')
-    }, 
+    // {
+    //   path: '/login',
+    //   name: 'login',
+    //   // route level code-splitting
+    //   // this generates a separate chunk (About.[hash].js) for this route
+    //   // which is lazy-loaded when the route is visited.
+    //   component: () => import('../views/LoginView.vue')
+    // }, 
     {
       path: '/document',
       name: 'document',

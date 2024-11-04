@@ -21,10 +21,14 @@ import vue from '@vitejs/plugin-vue'
         '/ttyd': {
           // target: 'http://127.0.0.1:8389',
           target: 'http://192.168.108.1/ttyd/',
-
           changeOrigin: true,
           ws: true, // 启用 WebSocket 转发
         },
+        // '/socket.io': {
+        //   target: 'http://192.168.108.1:5001',
+        //   changeOrigin: true,
+        //   ws: true, // 开启 WebSocket 代理
+        // },
       },
     },
   })

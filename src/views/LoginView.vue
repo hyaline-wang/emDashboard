@@ -62,7 +62,10 @@ const handleLogin = async () => {
 
       if (response.data.status === 'success') {
         // 在这里处理成功的登录逻辑
-        store.commit('login_in', response.data.device_id); // 调用 store 的 login_in 方法
+        store.commit('login_in',{
+            device_id: response.data.device_id,
+            session_id: response.data.session_id,
+          },); 
         router.push('/shell'); // 跳转到首页或其他页面
         ElMessage.success('登录成功！');
       } else {

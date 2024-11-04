@@ -19,16 +19,18 @@ const store = createStore({
         isLoggedIn: false,
         // isLoggedIn: localStorage.getItem('isLoggedIn') === 'true', // 从 localStorage 读取状态
         device_id: "",
+        session_id: "",
 
       }
     },
     mutations: {
-      login_in (state, device_id) {
-        state.device_id = device_id;
-        console.log('state.device_id', state.device_id)
+      login_in (state, payload) {
+        state.device_id = payload.device_id;
+        state.session_id = payload.session_id;
         state.isLoggedIn = true;
-        localStorage.setItem('device_id', device_id); // 设置 localStorage
-        console.log('state.isLoggedIn', state.isLoggedIn)
+        localStorage.setItem('device_id', state.device_id); // 设置 localStorage
+        console.log('state.device_id', state.device_id)
+        console.log('state.session_id', state.session_id)
       },
       increment (state) {
         state.count++;

@@ -7,19 +7,42 @@
             @error="handleError">
         </iframe>
 
-    <el-button plain @click="dialogVisible = true">
+    <!-- <el-button plain @click="dialogVisible = true">
         Click to open the Dialog
-    </el-button>
-    <el-dialog v-model="dialogVisible" title="CodeEidtor" width="90%" top="3vh">
+    </el-button> -->
+    <!-- <el-dialog v-model="dialogVisible" title="CodeEidtor" width="90%" top="3vh">
         <CodeEidtor />
-    </el-dialog>
+    </el-dialog> -->
     </div>
 
 </template>
 
 <script setup>
-import CodeEidtor from '@/components/CodeEidtor.vue';
+// import CodeEidtor from '@/components/CodeEidtor.vue';
 import { ref, onMounted } from 'vue';
+import { io } from 'socket.io-client';
+
+// 创建响应式变量
+const message = ref('');
+const messages = ref([]);
+// const socket = io('/codews/socket.io');
+// const socket = io('http://localhost:5000');
+
+// // 监听响应事件
+// socket.on('response', (data) => {
+//   messages.value.push(data);
+//   console.log('Received message:', data);
+// });
+
+// // 发送消息的函数
+// const sendMessage = () => {
+//   if (message.value) {
+//     // 发送消息到 Flask 服务器
+//     console.log('Sending message:', message.value);
+//     socket.emit('message', message.value);
+//     message.value = ''; // 清空输入框
+//   }
+// };
 const iframeSrc = ref(""); // 替换为你想要加载的URL
 const loadSuccess = ref(false);
 // const iframe = ref(null);

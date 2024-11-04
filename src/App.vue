@@ -24,13 +24,16 @@ const handleVerifyLogin = async () => {
   if (storedDeviceId !== null) {
     try {
       console.log('Verify Login Status', storedDeviceId);
-      const response = await axios.get('/api/verify_login',{
+      const response = await axios.get('/api/verify_login', {
         params: {
           device_id: storedDeviceId,
         }
       });
       if (response.data.status === 'success') {
-        store.commit('login_in', storedDeviceId);
+        store.commit('login_in',{
+            device_id: storedDeviceId,
+            session_id: response.data.session_id,
+          },); // 调用 store 的 login_in 方法
         ElMessage.success('登录验证成功');
       } else {
         ElMessage.error('登录验证失败');
@@ -54,10 +57,10 @@ onMounted(() => {
     <el-aside class="menu" width="200px">
       <NavView />
     </el-aside>
-    <el-main style="padding-left: 1px;padding-right: 1px " >
-        <router-view />
-        <!-- for iframe keep alive -->
-        <ShellView v-show="route.path=='/shell'"/>
+    <el-main style="padding-left: 1px;padding-right: 1px ">
+      <router-view />
+      <!-- for iframe keep alive -->
+      <ShellView v-show="route.path == '/shell'" />
     </el-main>
   </el-container>
   <LoginView v-else />
